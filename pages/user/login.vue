@@ -1,5 +1,5 @@
 <template>
-    
+    <div>登录验证</div>
 </template>
 
 <script>

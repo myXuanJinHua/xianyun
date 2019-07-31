@@ -1,5 +1,5 @@
 <template>
-    <div>airasdsfghfgjhkjlkhjgfds</div>
+    <div>机票</div>
 </template>
 
 <script>
