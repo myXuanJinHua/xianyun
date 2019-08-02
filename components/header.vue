@@ -18,12 +18,19 @@
       </div>
       <!--登录后 -->
       <div class="logined" v-else>
-        <img src="http://157.122.54.189:9095/assets/images/avatar.jpg" alt />
-        <span>{{$store.state.user.userInfo.user.nickname}}</span>
-        <el-dropdown-menu slot="dropdown">
-          <el-dropdown-item>个人中心</el-dropdown-item>
-          <el-dropdown-item @click.native="handleLogout">退出</el-dropdown-item>
-        </el-dropdown-menu>
+        <el-dropdown>
+          <span>
+            <img src="http://157.122.54.189:9095/assets/images/avatar.jpg" alt />
+            {{$store.state.user.userInfo.user.nickname}}
+            <i
+              class="el-icon-arrow-down el-icon--right"
+            ></i>
+          </span>
+          <el-dropdown-menu slot="dropdown">
+            <el-dropdown-item>个人中心</el-dropdown-item>
+            <el-dropdown-item @click.native="handleLogout">退出</el-dropdown-item>
+          </el-dropdown-menu>
+        </el-dropdown>
       </div>
     </el-row>
   </div>
@@ -39,8 +46,9 @@ export default {
     };
   },
   methods: {
+    // 退出
     handleLogout() {
-      this.$store.commit('user/setUserInfo',this.userInfo)
+      this.$store.commit("user/setUserInfo", this.userInfo);
     }
   }
 };
@@ -59,7 +67,7 @@ export default {
     }
   }
   .logined {
-    > img {
+    img {
       height: 36px;
       width: 36px;
       vertical-align: middle;

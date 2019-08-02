@@ -36,14 +36,14 @@ export default {
   },
   methods: {
       handleSubmit(){
-          console.log(this.loginForm)
+          // console.log(this.loginForm)
           this.$axios({
               url:'/accounts/login',
               method:'post',
               data:this.loginForm
           })
           .then(res=>{
-              console.log(res)
+              // console.log(res)
               this.$store.commit('user/setUserInfo',res.data)
               this.$router.push('/')
           })
