@@ -13,13 +13,17 @@
         <nuxt-link to="/air">国内机票</nuxt-link>
       </el-row>
       <!-- 登录标签 -->
-      <div class="login" v-if="false">
+      <div class="login" v-if="$store.state.user.userInfo.token==''">
         <nuxt-link to="/user/login">登录/注册</nuxt-link>
       </div>
       <!--登录后 -->
       <div class="logined" v-else>
         <img src="http://157.122.54.189:9095/assets/images/avatar.jpg" alt />
-        <nuxt-link to="/user/login">登录/注册</nuxt-link>
+        <span>{{$store.state.user.userInfo.user.nickname}}</span>
+        <el-dropdown-menu slot="dropdown">
+          <el-dropdown-item>个人中心</el-dropdown-item>
+          <el-dropdown-item @click.native="handleLogout">退出</el-dropdown-item>
+        </el-dropdown-menu>
       </div>
     </el-row>
   </div>
@@ -27,7 +31,17 @@
 <script>
 export default {
   data() {
-    return {};
+    return {
+      userInfo: {
+        token: "",
+        user: {}
+      }
+    };
+  },
+  methods: {
+    handleLogout() {
+      this.$store.commit('user/setUserInfo',this.userInfo)
+    }
   }
 };
 </script>
