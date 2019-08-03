@@ -49,6 +49,7 @@ export default {
     // 退出
     handleLogout() {
       this.$store.commit("user/setUserInfo", this.userInfo);
+      this.$router.push('/user/login')
     }
   }
 };
