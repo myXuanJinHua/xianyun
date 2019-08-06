@@ -1,44 +1,59 @@
 <template>
   <div class="flight-item">
-    <el-row type="flex" class="filghtsList" justify="space-between">
-      <el-col :span="5">南航 CZ3549</el-col>
-      <el-col :span="12">
-        <el-row type="flex" justify="center">
-          <el-col :span="8">
-            <div class="time">
-              <span class="big">06:55</span>
-              <span class="posi">浦东机场T2</span>
-            </div>
-          </el-col>
-          <el-col :span="7">
-            <span class="line">2时30分</span>
-          </el-col>
-          <el-col :span="6">
-            <div class="time">
-              <span class="big">09:25</span>
-              <span class="posi">白云机场T2</span>
-            </div>
-          </el-col>
-        </el-row>
-      </el-col>
-      <el-col :span="6">
-        ￥
-        <span class="big price">810</span> 起
-      </el-col>
-    </el-row>
-    <div class="flight-recommend">
+    <div @click="isShow = !isShow">
+      <!-- 显示的机票信息 -->
+      <el-row type="flex" align="middle" class="flight-info">
+        <el-col :span="6">
+          <span>{{ data.airline_name }}</span>
+          {{ data.flight_no }}
+        </el-col>
+        <el-col :span="12">
+          <el-row type="flex" justify="space-between" class="flight-info-center">
+            <el-col :span="8" class="flight-airport">
+              <strong>{{ data.dep_time }}</strong>
+              <span>{{ data.org_airport_name }}T1</span>
+            </el-col>
+            <el-col :span="8" class="flight-time">
+              <span>{{rankTime}}</span>
+            </el-col>
+            <el-col :span="8" class="flight-airport">
+              <strong>{{ data.arr_time }}</strong>
+              <span>{{ data.dst_airport_name }}T2</span>
+            </el-col>
+          </el-row>
+        </el-col>
+        <el-col :span="6" class="flight-info-right">
+          ￥
+          <span class="sell-price">{{ data.seat_infos[0].org_settle_price_child }}</span>起
+        </el-col>
+      </el-row>
+    </div>
+
+    <div class="flight-recommend" v-if="isShow">
       <!-- 隐藏的座位信息列表 -->
       <el-row type="flex" justify="space-between" align="middle">
         <el-col :span="4">低价推荐</el-col>
         <el-col :span="20">
-          <el-row type="flex" justify="space-between" align="middle" class="flight-sell">
+          <el-row
+            type="flex"
+            justify="space-between"
+            align="middle"
+            class="flight-sell"
+            v-for="(item, index) in  data.seat_infos"
+            :key="index"
+          >
             <el-col :span="16" class="flight-sell-left">
-              <span>经济舱</span> | 上海一诺千金航空服务有限公司
+              <span>{{ item.name }}</span>
+              | {{ item.supplierName }}
             </el-col>
-            <el-col :span="5" class="price">￥1345</el-col>
+            <el-col :span="5" class="price">￥{{ item.org_settle_price }}</el-col>
             <el-col :span="3" class="choose-button">
-              <el-button type="warning" size="mini">选定</el-button>
-              <p>剩余：83</p>
+              <el-button
+                type="warning"
+                size="mini"
+                @click="handleToLink( data.id,  item.seat_xid)"
+              >选定</el-button>
+              <p>剩余：{{ item.discount }}</p>
             </el-col>
           </el-row>
         </el-col>
@@ -46,74 +61,147 @@
     </div>
   </div>
 </template>
+
 <script>
-export default {};
+export default {
+  data() {
+    return {
+      isShow: false
+    };
+  },
+  // 声明组件可以接收哪些属性
+  // props: ["data"],
+
+  // props除了可以等于数组，还可以等于对象
+  // 好处就是可以知道该属性的类型，还有不传值时候还有默认值
+  props: {
+    data: {
+      type: Object, // 表示数据类型
+      default: {} // 如果调用组件时候不传该属性，会取这个默认值
+    }
+  },
+
+  computed: {
+    // 计算相隔时间
+    rankTime() {
+      const arr = this.data.arr_time.split(":"); // 到达时间的数组
+      const dep = this.data.dep_time.split(":"); // 触发事件的数组
+
+      if (arr[0] < dep[0]) {
+        arr[0] += 24;
+      }
+
+      const end = arr[0] * 60 + +arr[1];
+      const start = dep[0] * 60 + +dep[1];
+
+      // 相隔分钟
+      const dis = end - start;
+      const hours = Math.floor(dis / 60);
+      const min = dis % 60;
+
+      return `${hours}小时${min}分钟`;
+    }
+  },
+
+  methods: {
+    // 跳转表单页
+    handleToLink(id, seat_xid) {
+      this.$router.push({
+        path: "/air/order",
+        query: {
+          id,
+          seat_xid
+        }
+      });
+    }
+  }
+};
 </script>
-<style lang="less" scoped>
+
+<style scoped lang="less">
 .flight-item {
   border: 1px #ddd solid;
   margin-bottom: 10px;
-  .filghtsList {        
-    line-height: 80px;
-    padding-left: 50px;
-    .time {
-      position: relative;
-    }
-    span {
-      font-size: 12px;
-      color: #999;
-      &.big {
-        font-size: 20px;
-        color: #000;
-      }
-      &.price {
-        color: #ffa500;
-      }
-      &.posi {
-        position: absolute;
-        top: 20px;
-        left: 0;
-      }
-      &.line {
-        font-size: 14px;
-        padding-bottom: 10px;
-        border-bottom: 1px solid #ddd;
+
+  .flight-info {
+    padding: 15px;
+    cursor: pointer;
+
+    > div {
+      &:first-child,
+      &:last-child {
+        text-align: center;
       }
     }
   }
-  .flight-recommend {
-    background: #f6f6f6;
-    border-top: 1px #eee solid;
-    padding: 0 20px;
 
-    .flight-sell {
-      border-bottom: 1px #eee solid;
-      padding: 10px 0;
+  .flight-info-center {
+    padding: 0 30px;
+    text-align: center;
 
-      &:last-child {
-        border-bottom: none;
+    .flight-airport {
+      strong {
+        display: block;
+        font-size: 24px;
+        font-weight: normal;
       }
-
-      .flight-sell-left {
+      span {
         font-size: 12px;
-        span {
-          color: green;
-        }
+        color: #999;
       }
+    }
 
-      .price {
-        font-size: 20px;
-        color: orange;
+    .flight-time {
+      span {
+        display: inline-block;
+        padding: 10px 0;
+        border-bottom: 1px #eee solid;
+        color: #999;
       }
+    }
+  }
 
-      .choose-button {
-        text-align: center;
-        color: #666;
-        button {
-          display: block;
-          width: 100%;
-          margin-bottom: 5px;
-        }
+  .flight-info-right {
+    .sell-price {
+      font-size: 24px;
+      color: orange;
+      margin: 0 2px;
+    }
+  }
+}
+
+.flight-recommend {
+  background: #f6f6f6;
+  border-top: 1px #eee solid;
+  padding: 0 20px;
+
+  .flight-sell {
+    border-bottom: 1px #eee solid;
+    padding: 10px 0;
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    .flight-sell-left {
+      font-size: 12px;
+      span {
+        color: green;
+      }
+    }
+
+    .price {
+      font-size: 20px;
+      color: orange;
+    }
+
+    .choose-button {
+      text-align: center;
+      color: #666;
+      button {
+        display: block;
+        width: 100%;
+        margin-bottom: 5px;
       }
     }
   }
