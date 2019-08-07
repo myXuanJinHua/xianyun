@@ -48,7 +48,9 @@ export default {
         }
     },
     mounted () {
-        this.history=this.$store.state.air.historyList
+        this.history=JSON.parse(localStorage.getItem('store')||"[]").air.historyList
+        // this.history=this.$store.state.air.historyList
+        // console.log('钩子',this.history)
     }
 }
 </script>

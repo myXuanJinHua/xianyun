@@ -177,22 +177,23 @@ export default {
         });
         return;
       }
+
       // 跳转到机票列表页
       // console.log('跳转到机票列表页',this.airForm)
       this.$router.push({
         path: "/air/flights",
         // url的5个参数
         query: this.airForm
-      })
+      });
       // 获取vuex本地的存储
-      let arr= [...this.$store.state.air.historyList]
-      console.log(arr)
-      arr.unshift(this.airForm)
+      let arr = [...this.$store.state.air.historyList];
+      // console.log(arr)
+      arr.unshift(this.airForm);
       // 条件只容纳5条
-      if(arr.length>5){
-        arr.length=5
+      if (arr.length > 5) {
+        arr.length = 5;
       }
-      this.$store.commit('air/setHistoryList',arr)
+      this.$store.commit("air/setHistoryList", arr);
     }
   }
 };
